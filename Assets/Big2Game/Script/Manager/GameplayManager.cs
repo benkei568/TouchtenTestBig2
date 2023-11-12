@@ -22,7 +22,7 @@ public class GameplayManager : MonoBehaviour
             participantList[currentActiveParticipant].StartTurn();
         } }
 
-    int lastActiveParticipant;
+    public bool initialSubmit;
     int lastSubmitedCardsParticipant;
 
     private void Awake()
@@ -54,7 +54,7 @@ public class GameplayManager : MonoBehaviour
 
     public void Instantiate()
     {
-        lastActiveParticipant = -1;
+        initialSubmit = true;
         lastSubmitedCardsParticipant = -1;
     }
 
@@ -70,7 +70,8 @@ public class GameplayManager : MonoBehaviour
 
     public void SubmitCardCombination(int participantID, PlayedCardCombination playedCard, bool outOfCard)
     {
-        lastSubmitedCardsParticipant = participantID;
+        lastSubmitedCardsParticipant = participantID; Debug.Log("lastSubmitedCardsParticipant" + lastSubmitedCardsParticipant);
+        initialSubmit = false;
         if (outOfCard) EndGame();
         else NextTurn();
     }

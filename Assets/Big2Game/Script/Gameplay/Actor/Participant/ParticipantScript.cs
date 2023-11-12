@@ -11,7 +11,7 @@ public abstract class ParticipantScript : MonoBehaviour
     public Transform submitedCardTransform;
 
     [Header("RuntimeVariable")]
-    public bool currentActiveParticipant;
+    public bool isCurrentActive;
 
     ParticipantBaseState currentState;
     protected ParticipantReadyState readyState;
@@ -23,18 +23,20 @@ public abstract class ParticipantScript : MonoBehaviour
     List<CardScript> displaySubmitedCardScripts = new();
 
     public int participantID;
+    public string participantName;
 
     protected virtual void Awake()
     {
-        SetActiveParticipant(false);
+       
     }
 
     protected virtual void Start()
     {
+        SetActiveParticipant(false);
         SetState(readyState);
     }
 
-    public void SetParticipantID(int newID)
+    public virtual void SetParticipantID(int newID)
     {
         participantID = newID;
     }
@@ -83,13 +85,13 @@ public abstract class ParticipantScript : MonoBehaviour
 
     public void EndTurn()
     {
+        SetActiveParticipant(false);
         SetState(waitingState);
-        SetActiveParticipant( false);
     }
 
-    void SetActiveParticipant(bool isActive)
+    protected virtual void SetActiveParticipant(bool isActive)
     {
-        currentActiveParticipant = isActive;
+        isCurrentActive = isActive;
         uIStats.SetParticipantActiveTurn(isActive);
     }
 
@@ -105,14 +107,14 @@ public abstract class ParticipantScript : MonoBehaviour
 
     public void ParticipantSubmit(PlayedCardCombination playedCard)
     {
-        prevSubmitCard = playedCard;
-        foreach (var card in playedCard.cardList)
+        prevSubmitCard = new PlayedCardCombination() { combinationID = playedCard.combinationID, cardList = new List<int>(playedCard.cardList) };
+        foreach (var card in prevSubmitCard.cardList)
         {
             currentCard.Remove(card);
         }
         OnCardCountChanged(currentCard.Count);
         OnSubmitCardChange(prevSubmitCard);
-        GameplayManager.instance.SubmitCardCombination(participantID, playedCard, currentCard.Count <= 0);
+        GameplayManager.instance.SubmitCardCombination(participantID, prevSubmitCard, currentCard.Count <= 0);
     }
 
     void SetState(ParticipantBaseState newState)

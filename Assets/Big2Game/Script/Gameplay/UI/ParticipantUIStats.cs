@@ -8,6 +8,11 @@ public class ParticipantUIStats : MonoBehaviour
     public TextMeshProUGUI participantCardOwned;
     public GameObject activeParticipantImage;
 
+    public void UpdateName(string newName)
+    {
+        participantName.text = newName;
+    }
+
     public void UpdateCardOwned(int newQuantity)
     {
         participantCardOwned.text = "Card Left : " + newQuantity;

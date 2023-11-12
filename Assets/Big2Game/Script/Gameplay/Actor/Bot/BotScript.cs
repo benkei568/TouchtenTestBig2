@@ -15,6 +15,13 @@ public class BotScript : ParticipantScript
         waitingState = new ParticipantWaitingState();
     }
 
+    public override void SetParticipantID(int newID)
+    {
+        base.SetParticipantID(newID);
+        participantName = "Bot " + participantID;
+        uIStats.UpdateName(participantName);
+    }
+
     public List<PlayedCardCombination> GetPossibleCombinations()
     {
         return possibleCombinations;
@@ -33,7 +40,7 @@ public class BotScript : ParticipantScript
                 foreach (var combination in result)
                 {
                     var newCombination = new PlayedCardCombination() { cardList = combination.ToList() };
-                    if (currentRule.IsValidCombination(newCombination))
+                    if ((currentRule.IsValidCombination(newCombination) && (!GameplayManager.instance.initialSubmit || (GameplayManager.instance.initialSubmit && newCombination.InitialCombination()))))
                     {
                         newCombination.combinationID = i;
                         possibleCombinations.Add(newCombination);

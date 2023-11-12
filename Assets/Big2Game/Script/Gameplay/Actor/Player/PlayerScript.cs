@@ -55,7 +55,14 @@ public class PlayerScript : ParticipantScript
         SubmitCommand.Subscribe(_ =>
         {
             ParticipantSubmit(currentChoosenCombination);
-            ClearCommand.Execute();
+            while (currentChoosenCard.Count > 0)
+            {
+                currentChoosenCard[0].SetButtonInteractable(false);
+                ObjectPools.Instance.DeactivateObject(currentChoosenCard[0].gameObject);
+                currentChoosenCombination.cardList.Remove(currentChoosenCard[0].cardID);
+                currentChoosenCard.RemoveAt(0);
+            }
+            OnUpdateChoosenCombination();
         }).AddTo(this);
         ClearCommand.Subscribe(_ =>
         {
@@ -74,9 +81,9 @@ public class PlayerScript : ParticipantScript
     protected override void Start()
     {
         base.Start();
-        SkipCommand.CanExecute
+        /*SkipCommand.CanExecute
             .Where(_ => !GameplayManager.instance.MustSubmitTurn() && currentActiveParticipant)
-            /*.SubscribeToInteractable(PassButton)*/;
+            .SubscribeToInteractable(PassButton);
         SubmitCommand.CanExecute
             .Where(_ =>
             {
@@ -90,11 +97,17 @@ public class PlayerScript : ParticipantScript
                 }
                 return false;
             })
-            /*.SubscribeToInteractable(SubmitButton)*/;
+            .SubscribeToInteractable(SubmitButton);
         ClearCommand.CanExecute
              .Where(_ => currentChoosenCard.Count > 0 && currentActiveParticipant)
-             /*.SubscribeToInteractable(ClearButton)*/;
-        SetPlayerInteractable(false);
+             .SubscribeToInteractable(ClearButton);*/
+    }
+
+    public override void SetParticipantID(int newID)
+    {
+        base.SetParticipantID(newID);
+        participantName = "Player";
+        uIStats.UpdateName(participantName);
     }
 
     protected override void OnCardCountChanged(int newCardCount)
@@ -103,14 +116,14 @@ public class PlayerScript : ParticipantScript
         OnCurrentCardChange();
     }
 
-    public void SetPlayerInteractable(bool isInteractable)
+    protected override void SetActiveParticipant(bool isActive)
     {
+        base.SetActiveParticipant(isActive);
+        UpdateAllButton();
         foreach (var card in currentDisplayCard)
         {
-            card.SetButtonInteractable(isInteractable);
+            card.SetButtonInteractable(isActive);
         }
-        /*PassButton.interactable = isInteractable;
-        ClearButton.interactable = isInteractable;*/
     }
 
     void OnCurrentCardChange()
@@ -160,10 +173,48 @@ public class PlayerScript : ParticipantScript
     void OnUpdateChoosenCombination()
     {
         currentChoosenCombination = CardManager.instance.ValidateCombination(currentChoosenCombination);
-        /*var prevCombination = GameplayManager.instance.GetLastActiveCombination();
-        if (prevCombination.IsCombinationValid())
-            SubmitButton.interactable = currentChoosenCombination.IsCombinationValid() && CardManager.instance.IsCombinationHigherValue(prevCombination, currentChoosenCombination);
+        UpdateSubmitButton();
+        UpdateClearButton();
+    }
+
+    void UpdateAllButton()
+    {
+        UpdatePassButton();
+        UpdateSubmitButton();
+        UpdateClearButton();
+    }
+
+    void UpdatePassButton()
+    {
+        PassButton.interactable = !GameplayManager.instance.MustSubmitTurn() && isCurrentActive;
+    } 
+
+    void UpdateSubmitButton()
+    {
+        if (isCurrentActive && currentChoosenCombination.IsCombinationValid())
+        {
+            if (GameplayManager.instance.initialSubmit)
+            {
+                SubmitButton.interactable = currentChoosenCombination.InitialCombination();
+            }
+            else
+            {
+                var prevCombination = GameplayManager.instance.GetLastActiveCombination();
+                if (prevCombination.IsCombinationValid())
+                    SubmitButton.interactable = CardManager.instance.IsCombinationHigherValue(prevCombination, currentChoosenCombination);
+                else
+                    SubmitButton.interactable = true;
+            }
+        }
         else
-            SubmitButton.interactable = currentChoosenCombination.IsCombinationValid();*/
+        {
+            SubmitButton.interactable = false;
+        }
+    }
+
+    void UpdateClearButton()
+    {
+        Debug.Log("UpdateClearButton" + currentChoosenCard.Count);
+        ClearButton.interactable = currentChoosenCard.Count > 0 && isCurrentActive;
     }
 }

@@ -75,6 +75,11 @@ public class PlayedCardCombination
         return combinationID >= 0;
     }
 
+    public bool InitialCombination()
+    {
+        return cardList.Contains(0);
+    }
+
     public CardData GetCardData(int index)
     {
         return CardManager.instance.GetDictionarySO().GetCardByID(cardList[index]);
