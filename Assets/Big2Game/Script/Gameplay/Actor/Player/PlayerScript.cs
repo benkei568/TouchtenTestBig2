@@ -216,7 +216,6 @@ public class PlayerScript : ParticipantScript
 
     void UpdateClearButton()
     {
-        Debug.Log("UpdateClearButton" + currentChoosenCard.Count);
         ClearButton.interactable = currentChoosenCard.Count > 0 && isCurrentActive;
     }
 }

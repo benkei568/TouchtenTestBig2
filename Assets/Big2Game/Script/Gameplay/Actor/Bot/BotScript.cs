@@ -46,9 +46,9 @@ public class BotScript : ParticipantScript
                 foreach (var combination in result)
                 {
                     var newCombination = new PlayedCardCombination() { cardList = combination.ToList() };
-                    if ((currentRule.IsValidCombination(newCombination) && (!GameplayManager.instance.initialSubmit || (GameplayManager.instance.initialSubmit && newCombination.InitialCombination()))))
+                    newCombination = ValidateCombination(currentRule, newCombination);
+                    if ((newCombination.IsCombinationValid() && (!GameplayManager.instance.initialSubmit || (GameplayManager.instance.initialSubmit && newCombination.InitialCombination()))))
                     {
-                        newCombination.combinationID = i;
                         possibleCombinations.Add(newCombination);
                     }
                 }
@@ -61,14 +61,30 @@ public class BotScript : ParticipantScript
             foreach (var combination in result)
             {
                 var newCombination = new PlayedCardCombination() { cardList = combination.ToList() };
-                if (currentRule.IsValidCombination(newCombination) && currentRule.IsNewHigherRank(prevPlayedCard, newCombination))
+                newCombination = ValidateCombination(currentRule, newCombination);
+                if (newCombination.IsCombinationValid() && newCombination.combinationID == prevPlayedCard.combinationID && currentRule.IsNewHigherRank(prevPlayedCard, newCombination))
                 {
-                    newCombination.combinationID = prevPlayedCard.combinationID;
                     possibleCombinations.Add(newCombination);
                 }
             }
         }
        
+    }
+
+    PlayedCardCombination ValidateCombination(RuleCardCombination ruleCard, PlayedCardCombination cardCombination)
+    {
+        var result = ruleCard.IsValidCombination(cardCombination);
+        if (result.isValid)
+        {
+            cardCombination.combinationID = ruleCard.ruleID;
+            cardCombination.combinationEnum = result.fiveCombinationEnum;
+            cardCombination.customComparisonValue = result.comparisonValue;
+            return cardCombination;
+        }
+        cardCombination.combinationID = -1;
+        cardCombination.combinationEnum = FiveCombinationEnum.none;
+        cardCombination.customComparisonValue = -1;
+        return cardCombination;
     }
 
     public static IEnumerable<IEnumerable<T>> GetPermutations<T>(IEnumerable<T> list, int length)
