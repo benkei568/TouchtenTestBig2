@@ -9,6 +9,7 @@ using ObjectPooling;
 
 public class PlayerScript : ParticipantScript
 {
+    [Header("Initial Variable")]
     public Transform displayCardParent;
     public Transform displayCardTransform;
 
@@ -81,6 +82,7 @@ public class PlayerScript : ParticipantScript
     protected override void Start()
     {
         base.Start();
+        uIStats.UpdateCharacterSprite(GameManager.instance.characterSprite);
         /*SkipCommand.CanExecute
             .Where(_ => !GameplayManager.instance.MustSubmitTurn() && currentActiveParticipant)
             .SubscribeToInteractable(PassButton);

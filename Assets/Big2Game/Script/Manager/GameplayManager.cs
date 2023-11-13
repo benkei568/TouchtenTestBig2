@@ -70,9 +70,9 @@ public class GameplayManager : MonoBehaviour
 
     public void SubmitCardCombination(int participantID, PlayedCardCombination playedCard, bool outOfCard)
     {
-        lastSubmitedCardsParticipant = participantID; Debug.Log("lastSubmitedCardsParticipant" + lastSubmitedCardsParticipant);
+        lastSubmitedCardsParticipant = participantID; //Debug.Log("lastSubmitedCardsParticipant" + lastSubmitedCardsParticipant);
         initialSubmit = false;
-        if (outOfCard) EndGame();
+        if (outOfCard) EndGame(participantList[lastSubmitedCardsParticipant]);
         else NextTurn();
     }
 
@@ -88,9 +88,9 @@ public class GameplayManager : MonoBehaviour
         }
     }
 
-    void EndGame()
+    void EndGame(ParticipantScript winner)
     {
-
+        EventManager.instance.OnEndGame(winner);
     }
 
     public bool MustSubmitTurn()

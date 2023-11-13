@@ -19,6 +19,7 @@ public  class EventManager : MonoBehaviour
         }
     }
 
+
     public void OnEndGame(ParticipantScript winnerParticipant)
     {
         onEndGameEvent?.Invoke(winnerParticipant);

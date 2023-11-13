@@ -15,6 +15,12 @@ public class BotScript : ParticipantScript
         waitingState = new ParticipantWaitingState();
     }
 
+    protected override void Start()
+    {
+        base.Start();
+        uIStats.UpdateCharacterSprite((GameManager.instance.characterSprite + participantID) % GameplayManager.instance.participantList.Count);
+    }
+
     public override void SetParticipantID(int newID)
     {
         base.SetParticipantID(newID);

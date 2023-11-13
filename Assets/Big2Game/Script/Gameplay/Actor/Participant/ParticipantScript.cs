@@ -24,6 +24,7 @@ public abstract class ParticipantScript : MonoBehaviour
 
     public int participantID;
     public string participantName;
+    public int spriteID;
 
     protected virtual void Awake()
     {
@@ -98,6 +99,7 @@ public abstract class ParticipantScript : MonoBehaviour
     public void PassTurn()
     {
         GameplayManager.instance.PassTurn(participantID);
+        uIStats.OnParticipantPass();
     }
 
     public PlayedCardCombination GetPrevSubmitCard()
@@ -115,6 +117,7 @@ public abstract class ParticipantScript : MonoBehaviour
         OnCardCountChanged(currentCard.Count);
         OnSubmitCardChange(prevSubmitCard);
         GameplayManager.instance.SubmitCardCombination(participantID, prevSubmitCard, currentCard.Count <= 0);
+        uIStats.OnParticipantSubmit();
     }
 
     void SetState(ParticipantBaseState newState)
@@ -123,5 +126,6 @@ public abstract class ParticipantScript : MonoBehaviour
         currentState = newState;
         currentState.EnterState(this);
     }
+
 }
 
